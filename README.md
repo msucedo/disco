@@ -39,45 +39,48 @@ disco — ~/Proyecto                                150.0 GB libres · 172.5 GB 
 - **Python 3.8 o más nuevo.**
 - **macOS 14 (Sonoma) o más nuevo**, **cualquier Linux** o **Windows 10/11**.
 - En Windows, el modo interactivo necesita el paquete `windows-curses`. Si instalas
-  con pipx (abajo) se instala solo.
+  con pip (abajo) se instala solo.
 
 ## Instalación
 
-Con [pipx](https://pipx.pypa.io) (recomendado), que instala el comando `disco` para que
-lo uses desde cualquier carpeta.
+Con `pip`, que instala el comando `disco` para que lo uses desde cualquier carpeta.
 
-**macOS**
-
-```sh
-brew install pipx
-pipx ensurepath          # solo la primera vez; luego abre una terminal nueva
-pipx install git+https://github.com/msucedo/disco
-```
-
-**Linux** (Debian/Ubuntu; en otras distros instala `pipx` con su gestor de paquetes)
+**macOS y Linux** (en Debian/Ubuntu, instala antes `sudo apt install git python3-pip`)
 
 ```sh
-sudo apt install pipx git
-pipx ensurepath          # solo la primera vez; luego abre una terminal nueva
-pipx install git+https://github.com/msucedo/disco
+python3 -m pip install --user git+https://github.com/msucedo/disco
 ```
 
 **Windows** (en PowerShell o en Terminal; necesitas [Python](https://www.python.org/downloads/)
 y [Git](https://git-scm.com/download/win))
 
 ```powershell
-py -m pip install --user pipx
-py -m pipx ensurepath    # solo la primera vez; luego abre una terminal nueva
-pipx install git+https://github.com/msucedo/disco
+py -m pip install --user git+https://github.com/msucedo/disco
 ```
 
-Para actualizar a la última versión:
+Si después la terminal no encuentra `disco`, agrega a tu `PATH` la carpeta donde pip
+instala los comandos: `~/.local/bin` en Linux, `~/Library/Python/3.X/bin` en macOS
+(cambia `3.X` por tu versión de Python). En Windows, pip te muestra la ruta en un
+aviso al terminar de instalar.
+
+Si pip responde con el error `externally-managed-environment` (pasa con el Python de
+Homebrew y en Debian/Ubuntu recientes), instálalo en un entorno virtual:
 
 ```sh
-pipx upgrade disco
+python3 -m venv ~/.venvs/disco
+~/.venvs/disco/bin/pip install git+https://github.com/msucedo/disco
 ```
 
-Sin pipx, también puedes descargarlo y correrlo directo (en Windows, usa `py` en vez
+y agrega `~/.venvs/disco/bin` a tu `PATH`. O, si prefieres, añade
+`--break-system-packages` al comando de instalación.
+
+Para actualizar a la última versión (en Windows, usa `py` en vez de `python3`):
+
+```sh
+python3 -m pip install --user --upgrade git+https://github.com/msucedo/disco
+```
+
+Sin instalarlo, también puedes descargarlo y correrlo directo (en Windows, usa `py` en vez
 de `python3` e instala antes `py -m pip install windows-curses`):
 
 ```sh
@@ -173,8 +176,10 @@ se muestra "libres".
 
 ## Desinstalar
 
+En Windows, usa `py` en vez de `python3`:
+
 ```sh
-pipx uninstall disco
+python3 -m pip uninstall disco
 ```
 
 ## Licencia
