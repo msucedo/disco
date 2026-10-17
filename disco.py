@@ -341,7 +341,12 @@ def interactivo(stdscr, raiz):
             if disponibles > disco_["libre"]:
                 libre += f" · {legible(disponibles)} disponibles"
             libre += f" ({disco_['porcentaje']} % usado)"
-        poner(0, 0, f"disco — {actual}", curses.A_BOLD)
+        # La ruta se recorta por la izquierda para no pisar las cifras de la derecha.
+        titulo = "~" + actual[len(HOME):] if dentro_de(actual, HOME) else actual
+        cabe = ancho - len(libre) - len("disco — ") - 3
+        if len(titulo) > cabe:
+            titulo = "…" + titulo[-max(cabe - 1, 1):]
+        poner(0, 0, f"disco — {titulo}", curses.A_BOLD)
         poner(0, max(ancho - len(libre) - 1, 0), libre, CIAN_)
         poner(1, 0, "─" * ancho)
 

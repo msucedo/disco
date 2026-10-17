@@ -7,21 +7,21 @@ explorarlas para mandar a la Papelera lo que ya no necesitas, sin salir de la te
 
 ```
 $ disco
-Macintosh HD  [█████████████████████████░░░░░]  83.3%   411.8 GB usados · 82.6 GB libres · 117.2 GB disponibles · 494.4 GB total
+Macintosh HD  [█████████████████████░░░░░░░░░]  70.0%   350.0 GB usados · 150.0 GB libres · 172.5 GB disponibles · 500.0 GB total
 ```
 
 ```
 $ disco -c -n 5
-Library       [████████████████████████]  133.3 GB
-Downloads     [████████████░░░░░░░░░░░░]   68.5 GB
-Applications  [████░░░░░░░░░░░░░░░░░░░░]   24.1 GB
-Documents     [██░░░░░░░░░░░░░░░░░░░░░░]   12.5 GB
-.espressif    [██░░░░░░░░░░░░░░░░░░░░░░]    9.3 GB
+Library       [████████████████████████]   80.0 GB
+Downloads     [████████████░░░░░░░░░░░░]   40.0 GB
+Movies        [████████░░░░░░░░░░░░░░░░]   25.0 GB
+Documents     [████░░░░░░░░░░░░░░░░░░░░]   12.0 GB
+Pictures      [██░░░░░░░░░░░░░░░░░░░░░░]    6.5 GB
 ```
 
 ```
 $ disco -i ~/Proyecto
-disco — ~/Proyecto                                  82.5 GB libres · 117.1 GB disponibles (83.3 % usado)
+disco — ~/Proyecto                                150.0 GB libres · 172.5 GB disponibles (70.0 % usado)
 ───────────────────────────────────────────────────────────────────────────────────────────────────
      9.0 MB [████████████████████]  64.7%  Videos/
 >    3.0 MB [███████░░░░░░░░░░░░░]  21.6%  Fotos/
