@@ -1,24 +1,14 @@
 # disco
 
-**Mira y libera el espacio de tu disco desde la terminal.** Funciona en macOS, Linux y
-Windows.
+**Explora tu disco desde la terminal y manda a la Papelera lo que ya no necesitas.**
+Compatible con macOS, Linux y Windows.
 
-`disco` te dice cuánto espacio te queda, qué carpetas se lo están comiendo y te deja
-explorarlas para mandar a la Papelera lo que ya no necesitas, sin salir de la terminal.
+Corre `disco -i` y navega tus carpetas ordenadas de la más pesada a la más ligera:
+entras, ves qué se está comiendo el espacio y lo mandas a la Papelera sin salir de la
+terminal. También puedes ver rápido el espacio libre de tus discos (`disco`) o las
+carpetas más pesadas de un lugar (`disco -c`).
 
-```
-$ disco
-Macintosh HD  [█████████████████████░░░░░░░░░]  70.0%   350.0 GB usados · 150.0 GB libres · 172.5 GB disponibles · 500.0 GB total
-```
-
-```
-$ disco -c -n 5
-Library       [████████████████████████]   80.0 GB
-Downloads     [████████████░░░░░░░░░░░░]   40.0 GB
-Movies        [████████░░░░░░░░░░░░░░░░]   25.0 GB
-Documents     [████░░░░░░░░░░░░░░░░░░░░]   12.0 GB
-Pictures      [██░░░░░░░░░░░░░░░░░░░░░░]    6.5 GB
-```
+La forma principal de usarlo:
 
 ```
 $ disco -i ~/Proyecto
@@ -31,15 +21,33 @@ disco — ~/Proyecto                                150.0 GB libres · 172.5 GB 
    200.7 KB [░░░░░░░░░░░░░░░░░░░░]   1.4%  notas.txt
 
 ───────────────────────────────────────────────────────────────────────────────────────────────────
-↑↓ mover  →/Enter entrar  ← subir  d a la Papelera  o ver en Finder  r reescanear  q salir
+(↑↓) mover  (→/Enter) entrar  (←) subir  (d) a la Papelera  (o) ver en Finder  (r) reescanear  (q) salir
+```
+
+Además:
+
+```
+$ disco
+Macintosh HD  [█████████████████████░░░░░░░░░]  70.0%   350.0 GB usados · 150.0 GB libres · 172.5 GB disponibles · 500.0 GB total
+```
+
+```
+$ disco -c ~ -n 5
+Library       [████████████████████████]   80.0 GB
+Downloads     [████████████░░░░░░░░░░░░]   40.0 GB
+Movies        [████████░░░░░░░░░░░░░░░░]   25.0 GB
+Documents     [████░░░░░░░░░░░░░░░░░░░░]   12.0 GB
+Pictures      [██░░░░░░░░░░░░░░░░░░░░░░]    6.5 GB
 ```
 
 ## Requisitos
 
 - **Python 3.8 o más nuevo.**
-- **macOS 14 (Sonoma) o más nuevo**, **cualquier Linux** o **Windows 10/11**.
+- **macOS 14 o más nuevo**, **cualquier Linux** o **Windows 10/11**.
 - En Windows, el modo interactivo necesita el paquete `windows-curses`. Si instalas
-  con pip (abajo) se instala solo.
+  con pip (abajo), se instala solo. Si pip dice que no encuentra `windows-curses`, es
+  porque todavía no existe para tu versión de Python. Instala con una un poco más
+  vieja, por ejemplo `py -3.12 -m pip install --user git+https://github.com/msucedo/disco`.
 
 ## Instalación
 
@@ -58,13 +66,20 @@ y [Git](https://git-scm.com/download/win))
 py -m pip install --user git+https://github.com/msucedo/disco
 ```
 
+Para empezar, explora tu carpeta personal:
+
+```sh
+disco -i ~
+```
+
 Si después la terminal no encuentra `disco`, agrega a tu `PATH` la carpeta donde pip
 instala los comandos: `~/.local/bin` en Linux, `~/Library/Python/3.X/bin` en macOS
 (cambia `3.X` por tu versión de Python). En Windows, pip te muestra la ruta en un
 aviso al terminar de instalar.
 
 Si pip responde con el error `externally-managed-environment` (pasa con el Python de
-Homebrew y en Debian/Ubuntu recientes), instálalo en un entorno virtual:
+Homebrew y en Debian/Ubuntu recientes), instálalo en un entorno virtual (en
+Debian/Ubuntu, instala antes `sudo apt install python3-venv`):
 
 ```sh
 python3 -m venv ~/.venvs/disco
@@ -74,49 +89,53 @@ python3 -m venv ~/.venvs/disco
 y agrega `~/.venvs/disco/bin` a tu `PATH`. O, si prefieres, añade
 `--break-system-packages` al comando de instalación.
 
-Para actualizar a la última versión (en Windows, usa `py` en vez de `python3`):
+### Actualizar
+
+**macOS y Linux**
 
 ```sh
 python3 -m pip install --user --upgrade git+https://github.com/msucedo/disco
 ```
 
-Sin instalarlo, también puedes descargarlo y correrlo directo (en Windows, usa `py` en vez
-de `python3` e instala antes `py -m pip install windows-curses`):
+**Windows**
+
+```powershell
+py -m pip install --user --upgrade git+https://github.com/msucedo/disco
+```
+
+### Sin instalarlo
+
+También puedes descargarlo y correrlo directo.
+
+**macOS y Linux**
 
 ```sh
 git clone https://github.com/msucedo/disco
 cd disco
-python3 disco.py
+python3 disco.py -i
+```
+
+**Windows**
+
+```powershell
+py -m pip install --user windows-curses
+git clone https://github.com/msucedo/disco
+cd disco
+py disco.py -i
 ```
 
 ## Uso
-
-| Comando | Qué hace |
-|---|---|
-| `disco` | Espacio de cada disco conectado: usado, libre, disponible (solo macOS) y total. |
-| `disco -c [RUTA]` | Las carpetas más pesadas dentro de `RUTA` (por defecto, la carpeta actual). |
-| `disco -c RUTA -n 5` | Igual, pero solo las 5 más pesadas (por defecto, 15). |
-| `disco -i [RUTA]` | Navegador interactivo para explorar `RUTA` y mandar cosas a la Papelera (por defecto, la carpeta actual). |
-| `disco --json` | La salida en JSON, para usarla en scripts (funciona con `disco` y `disco -c`). |
-| `disco -w 50` | Cambia el ancho de las barras (por defecto, 30). |
-| `disco -h` | Ayuda con todas las opciones. |
-| `disco -V` | Versión instalada. |
-
-`disco -c` puede tardar un minuto en carpetas grandes, porque tiene que medir todo lo
-que hay adentro. En Windows tarda un poco más, porque no existe `du` y `disco` lo mide
-por su cuenta.
-
-En Windows, `~` también funciona: `disco -c ~\Downloads`.
 
 ### Modo interactivo (`disco -i`)
 
 Al abrirlo, `disco` mide la carpeta completa y te muestra lo que hay adentro, de lo
 más pesado a lo más ligero. Sin `RUTA`, empieza en la carpeta donde estás parado
-(`cd /Users && disco -i` abre `/Users`).
+(`cd ~/Downloads && disco -i` abre `~/Downloads`).
 
-Con `←` puedes subir más allá de la carpeta de inicio: desde `~` llegas a `/Users`, y
-de ahí a `/`. Al subir, `disco` solo mide lo nuevo y no vuelve a medir lo que ya
-tenía, así que es rápido.
+Con `←` puedes subir más allá de la carpeta de inicio: desde tu carpeta personal
+llegas a la que contiene a todos los usuarios (`/Users` en macOS, `/home` en Linux,
+`C:\Users` en Windows), y de ahí a la raíz del disco. Al subir, `disco` solo mide lo
+nuevo y no vuelve a medir lo que ya tenía, así que es rápido.
 
 | Tecla | Acción |
 |---|---|
@@ -132,6 +151,25 @@ tenía, así que es rápido.
 Cuando mandas algo a la Papelera, abajo aparece en amarillo cuánto espacio vas a
 liberar. Ese espacio **no se libera hasta que vacías la Papelera**, con `v` o desde
 tu sistema.
+
+### Otros comandos
+
+| Comando | Qué hace |
+|---|---|
+| `disco -i [RUTA]` | Navegador interactivo para explorar `RUTA` y mandar cosas a la Papelera (por defecto, la carpeta actual). |
+| `disco` | Espacio de cada disco conectado: usado, libre, disponible (solo macOS) y total. |
+| `disco -c [RUTA]` | Las carpetas más pesadas dentro de `RUTA` (por defecto, la carpeta actual). |
+| `disco -c RUTA -n 5` | Igual, pero solo las 5 más pesadas (por defecto, 15). |
+| `disco --json` | La salida en JSON, para usarla en scripts (funciona con `disco` y `disco -c`). |
+| `disco -w 50` | Cambia el ancho de las barras (por defecto, 30). |
+| `disco -h` | Ayuda con todas las opciones. |
+| `disco -V` | Versión instalada. |
+
+`disco -i` y `disco -c` pueden tardar un minuto en carpetas grandes, porque tienen que
+medir todo lo que hay adentro. En Windows tardan un poco más, porque no existe `du` y
+`disco` lo mide por su cuenta.
+
+En Windows, `~` también funciona: `disco -i ~\Downloads`.
 
 ## ¿Es seguro?
 
@@ -181,11 +219,19 @@ se muestra "libres".
 
 ## Desinstalar
 
-En Windows, usa `py` en vez de `python3`:
+**macOS y Linux**
 
 ```sh
 python3 -m pip uninstall disco
 ```
+
+**Windows**
+
+```powershell
+py -m pip uninstall disco
+```
+
+Si lo instalaste en un entorno virtual, basta con borrar `~/.venvs/disco`.
 
 ## Licencia
 
