@@ -5,16 +5,21 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "disco"
 dynamic = ["version"]
-description = "Mira y libera el espacio de tu Mac desde la terminal."
+description = "Mira y libera el espacio de tu disco desde la terminal (macOS, Linux y Windows)."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "msucedo" }]
 requires-python = ">=3.8"
+# Python en Windows no trae curses (lo usa disco -i).
+dependencies = ["windows-curses; sys_platform == 'win32'"]
 classifiers = [
     "Environment :: Console :: Curses",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: Spanish",
+    "Operating System :: OS Independent",
     "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
     "Topic :: System :: Filesystems",
 ]
