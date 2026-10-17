@@ -393,6 +393,33 @@ class Arbol:
                 self.tam[padre] += delta
             ruta, padre = padre, os.path.dirname(padre)
 
+    def subir(self, padre, progreso=None):
+        """Cambia la raíz a `padre` sin volver a medir la raíz anterior: solo mide lo
+        que tiene `padre` alrededor de ella (mismas reglas que tamanos_python)."""
+        vieja = self.raiz
+        dev = os.stat(padre).st_dev
+        total = self.tam.get(vieja, 0)
+        carpetas = []
+        with os.scandir(padre) as it:
+            for e in it:
+                ruta = os.path.normpath(e.path)
+                if ruta == vieja:
+                    continue
+                try:
+                    st = e.stat(follow_symlinks=False)
+                    es_dir = e.is_dir(follow_symlinks=False)
+                except OSError:
+                    continue
+                if not es_dir:
+                    total += tamano_archivo(st)
+                elif not (getattr(st, "st_file_attributes", 0) & REPARSE_POINT) and \
+                        (WINDOWS or st.st_dev == dev):
+                    carpetas.append(ruta)
+        self.raiz = padre
+        self.tam[padre] = total
+        for ruta in carpetas:
+            self.escanear(ruta, progreso)  # suma su tamaño a `padre`
+
     def listar(self, carpeta):
         """[(nombre, ruta, bytes, es_carpeta)] de mayor a menor."""
         items = []
@@ -754,6 +781,21 @@ def interactivo(stdscr, raiz):
             if pila:
                 actual, cursor, arriba = pila.pop()
                 items = None
+            elif os.path.dirname(raiz) != raiz:
+                # En la carpeta de inicio: sube a la que la contiene.
+                padre = os.path.dirname(raiz)
+                try:
+                    arbol.subir(padre, progreso)
+                except OSError as e:
+                    estado = f"No se pudo leer {padre}: {e.strerror}"
+                else:
+                    try:
+                        nombres = [it[1] for it in arbol.listar(padre)]
+                    except OSError:
+                        nombres = []
+                    cursor = nombres.index(raiz) if raiz in nombres else 0
+                    raiz = actual = padre
+                    arriba, items, disponibles = 0, None, None
         elif tecla in (ord("o"), ord("O")) and sel:
             error = mostrar_en_carpeta(sel[1])
             if error:
@@ -833,9 +875,10 @@ TEXTOS_ARGPARSE = {
 EJEMPLOS = """\
 ejemplos:
   disco                      espacio de cada disco
-  disco -c                   carpetas más pesadas de tu carpeta personal
+  disco -c                   carpetas más pesadas de la carpeta actual
   disco -c ~/Downloads -n 5  las 5 más pesadas de ~/Downloads
-  disco -i                   explorar ~ y mandar cosas a la Papelera
+  disco -i                   explorar la carpeta actual y mandar cosas a la Papelera
+  disco -i ~                 lo mismo, pero en tu carpeta personal
   disco --json               salida en JSON
 """
 
@@ -873,13 +916,14 @@ def main():
     parser.add_argument("-w", "--width", type=int, default=30, metavar="ANCHO",
                         help="ancho de la barra (30)")
     parser.add_argument(
-        "-c", "--carpetas", nargs="?", const=os.path.expanduser("~"), metavar="RUTA",
-        help="muestra las carpetas más pesadas dentro de RUTA (por defecto, tu carpeta personal)",
+        "-c", "--carpetas", nargs="?", const=".", metavar="RUTA",
+        help="muestra las carpetas más pesadas dentro de RUTA (por defecto, la carpeta actual)",
     )
     parser.add_argument("-n", type=int, default=15, help="con -c: cuántas carpetas mostrar (15)")
     parser.add_argument(
-        "-i", "--interactivo", nargs="?", const=os.path.expanduser("~"), metavar="RUTA",
-        help="navegador para explorar RUTA y mover cosas a la Papelera (por defecto, ~)",
+        "-i", "--interactivo", nargs="?", const=".", metavar="RUTA",
+        help="navegador para explorar RUTA y mover cosas a la Papelera "
+             "(por defecto, la carpeta actual)",
     )
     args = parser.parse_args()
 
@@ -907,7 +951,7 @@ def main():
         return
 
     if args.carpetas:
-        ruta = os.path.expanduser(args.carpetas)
+        ruta = os.path.realpath(os.path.expanduser(args.carpetas))
         if not os.path.isdir(ruta):
             parser.error(f"no existe la carpeta: {ruta}")
         mostrar_carpetas(ruta, max(args.n, 1), max(args.width, 1), color, args.json)

@@ -94,9 +94,9 @@ python3 disco.py
 | Comando | Qué hace |
 |---|---|
 | `disco` | Espacio de cada disco conectado: usado, libre, disponible (solo macOS) y total. |
-| `disco -c [RUTA]` | Las carpetas más pesadas dentro de `RUTA` (por defecto, tu carpeta personal). |
+| `disco -c [RUTA]` | Las carpetas más pesadas dentro de `RUTA` (por defecto, la carpeta actual). |
 | `disco -c RUTA -n 5` | Igual, pero solo las 5 más pesadas (por defecto, 15). |
-| `disco -i [RUTA]` | Navegador interactivo para explorar `RUTA` y mandar cosas a la Papelera (por defecto, `~`). |
+| `disco -i [RUTA]` | Navegador interactivo para explorar `RUTA` y mandar cosas a la Papelera (por defecto, la carpeta actual). |
 | `disco --json` | La salida en JSON, para usarla en scripts (funciona con `disco` y `disco -c`). |
 | `disco -w 50` | Cambia el ancho de las barras (por defecto, 30). |
 | `disco -h` | Ayuda con todas las opciones. |
@@ -111,13 +111,18 @@ En Windows, `~` también funciona: `disco -c ~\Downloads`.
 ### Modo interactivo (`disco -i`)
 
 Al abrirlo, `disco` mide la carpeta completa y te muestra lo que hay adentro, de lo
-más pesado a lo más ligero.
+más pesado a lo más ligero. Sin `RUTA`, empieza en la carpeta donde estás parado
+(`cd /Users && disco -i` abre `/Users`).
+
+Con `←` puedes subir más allá de la carpeta de inicio: desde `~` llegas a `/Users`, y
+de ahí a `/`. Al subir, `disco` solo mide lo nuevo y no vuelve a medir lo que ya
+tenía, así que es rápido.
 
 | Tecla | Acción |
 |---|---|
 | `↑` `↓` (o `k` `j`) | Moverse por la lista |
 | `→` / `Enter` (o `l`) | Entrar a la carpeta |
-| `←` (o `h`) | Volver a la carpeta anterior |
+| `←` (o `h`) | Volver a la carpeta anterior; en la carpeta de inicio, sube a la que la contiene |
 | `d` | Mandar a la Papelera lo seleccionado (pide confirmación) |
 | `o` | Mostrarlo en el Finder, el Explorador de Windows o el administrador de archivos de Linux |
 | `r` | Volver a medir la carpeta actual |
