@@ -44,10 +44,10 @@ Pictures      [██░░░░░░░░░░░░░░░░░░░�
 
 - **Python 3.8 o más nuevo.**
 - **macOS 14 o más nuevo**, **cualquier Linux** o **Windows 10/11**.
-- En Windows, el modo interactivo necesita el paquete `windows-curses`. Si instalas
-  con pip (abajo), se instala solo. Si pip dice que no encuentra `windows-curses`, es
-  porque todavía no existe para tu versión de Python. Instala con una un poco más
-  vieja, por ejemplo `py -3.12 -m pip install --user git+https://github.com/msucedo/disco`.
+- En Windows, usa **Python 3.13** (`py -3.13` en los comandos de abajo). El modo
+  interactivo necesita `windows-curses`, que todavía no tiene versión para Python más
+  nuevo; con 3.13, pip lo instala solo. `py --list` te dice qué versiones tienes; si
+  no tienes la 3.13, bájala de [python.org](https://www.python.org/downloads/windows/).
 
 ## Instalación
 
@@ -63,7 +63,7 @@ python3 -m pip install --user git+https://github.com/msucedo/disco
 y [Git](https://git-scm.com/download/win))
 
 ```powershell
-py -m pip install --user git+https://github.com/msucedo/disco
+py -3.13 -m pip install --user git+https://github.com/msucedo/disco
 ```
 
 Para empezar, explora tu carpeta personal:
@@ -100,8 +100,11 @@ python3 -m pip install --user --upgrade git+https://github.com/msucedo/disco
 **Windows**
 
 ```powershell
-py -m pip install --user --upgrade git+https://github.com/msucedo/disco
+py -3.13 -m pip install --user --upgrade --force-reinstall git+https://github.com/msucedo/disco
 ```
+
+`--force-reinstall` hace que baje lo último aunque el número de versión no haya
+cambiado.
 
 ### Sin instalarlo
 
@@ -118,10 +121,10 @@ python3 disco.py -i
 **Windows**
 
 ```powershell
-py -m pip install --user windows-curses
+py -3.13 -m pip install --user windows-curses
 git clone https://github.com/msucedo/disco
 cd disco
-py disco.py -i
+py -3.13 disco.py -i
 ```
 
 ## Uso
@@ -228,7 +231,7 @@ python3 -m pip uninstall disco
 **Windows**
 
 ```powershell
-py -m pip uninstall disco
+py -3.13 -m pip uninstall disco
 ```
 
 Si lo instalaste en un entorno virtual, basta con borrar `~/.venvs/disco`.
