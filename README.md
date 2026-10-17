@@ -155,6 +155,21 @@ Cuando mandas algo a la Papelera, abajo aparece en amarillo cuánto espacio vas 
 liberar. Ese espacio **no se libera hasta que vacías la Papelera**, con `v` o desde
 tu sistema.
 
+Cada cosa que mandas a la Papelera queda anotada en un historial. Con `disco -s` ves
+cuánto llevas:
+
+```
+$ disco -s
+Con disco has liberado 3.2 GB hoy y 52.1 GB desde que lo instalaste.
+```
+
+El historial es un archivo de texto con una línea por cosa (fecha, tamaño y ruta).
+Lo puedes abrir para ver qué borraste:
+
+- macOS: `~/Library/Application Support/disco/historial.tsv`
+- Linux: `~/.local/state/disco/historial.tsv`
+- Windows: `%LOCALAPPDATA%\disco\historial.tsv`
+
 ### Otros comandos
 
 | Comando | Qué hace |
@@ -164,6 +179,7 @@ tu sistema.
 | `disco -c [RUTA]` | Las carpetas más pesadas dentro de `RUTA` (por defecto, la carpeta actual). |
 | `disco -c RUTA -n 5` | Igual, pero solo las 5 más pesadas (por defecto, 15). |
 | `disco --json` | La salida en JSON, para usarla en scripts (funciona con `disco` y `disco -c`). |
+| `disco -s` | Cuánto has liberado con `disco` hoy y desde que lo instalaste (cuenta lo que mandas a la Papelera con `d`). |
 | `disco -w 50` | Cambia el ancho de las barras (por defecto, 30). |
 | `disco -h` | Ayuda con todas las opciones. |
 | `disco -V` | Versión instalada. |

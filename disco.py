@@ -3,7 +3,7 @@
 pesadas, y un navegador interactivo para limpiar el disco. Corre en macOS, Linux y
 Windows."""
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 import argparse
 import json
@@ -325,6 +325,8 @@ if WINDOWS:
     EXCEPTO = (os.path.join(APPDATA, "Local", "Temp"),)
     NOMBRES_PROTEGIDOS = {"$recycle.bin", "system volume information"}
     NOMBRE_EXPLORADOR = "en el Explorador"
+    HISTORIAL = os.path.join(os.environ.get("LOCALAPPDATA") or
+                             os.path.join(HOME, "AppData", "Local"), "disco", "historial.tsv")
 elif LINUX:
     DATOS_XDG = os.environ.get("XDG_DATA_HOME") or os.path.join(HOME, ".local", "share")
     PAPELERA_LINUX = os.path.join(DATOS_XDG, "Trash")
@@ -338,6 +340,8 @@ elif LINUX:
     EXCEPTO = ()
     NOMBRES_PROTEGIDOS = set()
     NOMBRE_EXPLORADOR = "su carpeta"
+    HISTORIAL = os.path.join(os.environ.get("XDG_STATE_HOME") or
+                             os.path.join(HOME, ".local", "state"), "disco", "historial.tsv")
 else:
     LIBRARY = os.path.join(HOME, "Library")
     PROTEGIDAS = {
@@ -352,6 +356,7 @@ else:
     EXCEPTO = (os.path.join(LIBRARY, "Caches"),)
     NOMBRES_PROTEGIDOS = set()
     NOMBRE_EXPLORADOR = "en Finder"
+    HISTORIAL = os.path.join(LIBRARY, "Application Support", "disco", "historial.tsv")
 
 PROTEGIDAS = {os.path.normcase(p) for p in PROTEGIDAS}
 
@@ -456,6 +461,38 @@ def aviso_extra(ruta):
             not any(dentro_de(ruta, e) for e in EXCEPTO):
         return "Ojo: pertenece a una app; borrarlo puede hacerle perder datos o configuración."
     return None
+
+
+# --- Historial --------------------------------------------------------------
+# Una línea por cada cosa mandada a la Papelera: fecha, bytes y ruta, separados por
+# tabulador. Solo se agrega al final, nunca se reescribe.
+
+
+def anotar_liberado(ruta, tam):
+    ruta = ruta.replace("\t", " ").replace("\n", " ").replace("\r", " ")
+    try:
+        os.makedirs(os.path.dirname(HISTORIAL), exist_ok=True)
+        with open(HISTORIAL, "a", encoding="utf-8", errors="replace") as f:
+            f.write(f"{time.strftime('%Y-%m-%d')}\t{tam}\t{ruta}\n")
+    except OSError:
+        pass  # sin historial no pasa nada; lo importante es que se movió
+
+
+def liberado():
+    """(bytes de hoy, bytes en total) según el historial."""
+    hoy_fecha, hoy, total = time.strftime("%Y-%m-%d"), 0, 0
+    try:
+        with open(HISTORIAL, encoding="utf-8", errors="replace") as f:
+            for linea in f:
+                partes = linea.split("\t", 2)
+                if len(partes) < 2 or not partes[1].isdigit():
+                    continue
+                total += int(partes[1])
+                if partes[0] == hoy_fecha:
+                    hoy += int(partes[1])
+    except OSError:
+        pass
+    return hoy, total
 
 
 # --- Papelera ---------------------------------------------------------------
@@ -855,6 +892,7 @@ def interactivo(stdscr, raiz):
                 else:
                     arbol._sumar_a_padres(ruta, -tam)
                 en_papelera.append((destino, tam))
+                anotar_liberado(ruta, tam)
                 estado = f'"{nombre}" se movió a la Papelera.'
                 items = disponibles = None
 
@@ -879,6 +917,7 @@ ejemplos:
   disco -c ~/Downloads -n 5  las 5 más pesadas de ~/Downloads
   disco -i                   explorar la carpeta actual y mandar cosas a la Papelera
   disco -i ~                 lo mismo, pero en tu carpeta personal
+  disco -s                   cuánto has liberado hoy y en total
   disco --json               salida en JSON
 """
 
@@ -925,9 +964,17 @@ def main():
         help="navegador para explorar RUTA y mover cosas a la Papelera "
              "(por defecto, la carpeta actual)",
     )
+    parser.add_argument("-s", "--historial", action="store_true",
+                        help="cuánto has liberado con disco hoy y desde que lo instalaste")
     args = parser.parse_args()
 
     color = sys.stdout.isatty() and "NO_COLOR" not in os.environ
+
+    if args.historial:
+        hoy, total = liberado()
+        print(f"Con disco has liberado {legible(hoy)} hoy y {legible(total)} "
+              "desde que lo instalaste.")
+        return
 
     if args.interactivo:
         ruta = os.path.realpath(os.path.expanduser(args.interactivo))
