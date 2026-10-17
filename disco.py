@@ -939,7 +939,7 @@ def main():
             import curses
         except ImportError:
             parser.error("falta el módulo curses; en Windows instálalo con: "
-                         "py -m pip install windows-curses")
+                         "py -3.13 -m pip install --user windows-curses")
         import locale
         locale.setlocale(locale.LC_ALL, "")
         try:
