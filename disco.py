@@ -268,14 +268,29 @@ def tamanos_python(ruta, progreso=None):
 
 
 def carpetas(ruta):
-    """Tamaño de cada subcarpeta directa de `ruta`, de mayor a menor."""
+    """Tamaño de cada subcarpeta y archivo directo de `ruta`, de mayor a menor."""
     if sys.stderr.isatty():
         print(f"Escaneando {ruta} … (puede tardar un minuto)", file=sys.stderr)
     raiz = os.path.normpath(ruta)
     resultado = [
-        {"ruta": path, "bytes": tam} for path, tam in tamanos(raiz).items()
+        {"ruta": path, "bytes": tam, "carpeta": True} for path, tam in tamanos(raiz).items()
         if path != raiz and os.path.dirname(path) == raiz
     ]
+    # du solo da carpetas; los archivos sueltos se miden aparte.
+    try:
+        with os.scandir(raiz) as it:
+            for e in it:
+                try:
+                    if not e.is_dir(follow_symlinks=False):
+                        resultado.append({
+                            "ruta": os.path.normpath(e.path),
+                            "bytes": tamano_archivo(e.stat(follow_symlinks=False)),
+                            "carpeta": False,
+                        })
+                except OSError:
+                    continue
+    except OSError:
+        pass
     resultado.sort(key=lambda c: c["bytes"], reverse=True)
     return resultado
 
@@ -289,7 +304,8 @@ def mostrar_carpetas(ruta, top, ancho, color, como_json):
         print(f"No se pudo leer nada en {ruta}")
         return
     mayor = datos[0]["bytes"] or 1
-    nombres = [os.path.basename(c["ruta"].rstrip(os.sep)) for c in datos]
+    nombres = [os.path.basename(c["ruta"].rstrip(os.sep)) + ("/" if c["carpeta"] else "")
+               for c in datos]
     ancho_nombre = max(len(n) for n in nombres)
     for nombre, c in zip(nombres, datos):
         pct = c["bytes"] / mayor * 100
@@ -913,7 +929,7 @@ TEXTOS_ARGPARSE = {
 EJEMPLOS = """\
 ejemplos:
   disco                      espacio de cada disco
-  disco -c                   carpetas más pesadas de la carpeta actual
+  disco -c                   lo más pesado (carpetas y archivos) de la carpeta actual
   disco -c ~/Downloads -n 5  las 5 más pesadas de ~/Downloads
   disco -i                   explorar la carpeta actual y mandar cosas a la Papelera
   disco -i ~                 lo mismo, pero en tu carpeta personal
@@ -956,7 +972,8 @@ def main():
                         help="ancho de la barra (30)")
     parser.add_argument(
         "-c", "--carpetas", nargs="?", const=".", metavar="RUTA",
-        help="muestra las carpetas más pesadas dentro de RUTA (por defecto, la carpeta actual)",
+        help="muestra lo más pesado (carpetas y archivos) dentro de RUTA "
+             "(por defecto, la carpeta actual)",
     )
     parser.add_argument("-n", type=int, default=15, help="con -c: cuántas carpetas mostrar (15)")
     parser.add_argument(

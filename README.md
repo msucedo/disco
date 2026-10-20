@@ -5,8 +5,8 @@ Compatible con macOS, Linux y Windows.
 
 Corre `disco -i` y navega tus carpetas ordenadas de la más pesada a la más ligera:
 entras, ves qué se está comiendo el espacio y lo mandas a la Papelera sin salir de la
-terminal. También puedes ver rápido el espacio libre de tus discos (`disco`) o las
-carpetas más pesadas de un lugar (`disco -c`).
+terminal. También puedes ver rápido el espacio libre de tus discos (`disco`) o lo más
+pesado de un lugar, carpetas y archivos (`disco -c`).
 
 La forma principal de usarlo:
 
@@ -33,11 +33,11 @@ Macintosh HD  [█████████████████████�
 
 ```
 $ disco -c ~ -n 5
-Library       [████████████████████████]   80.0 GB
-Downloads     [████████████░░░░░░░░░░░░]   40.0 GB
-Movies        [████████░░░░░░░░░░░░░░░░]   25.0 GB
-Documents     [████░░░░░░░░░░░░░░░░░░░░]   12.0 GB
-Pictures      [██░░░░░░░░░░░░░░░░░░░░░░]    6.5 GB
+Library/      [████████████████████████]   80.0 GB
+Downloads/    [████████████░░░░░░░░░░░░]   40.0 GB
+Movies/       [████████░░░░░░░░░░░░░░░░]   25.0 GB
+Documents/    [████░░░░░░░░░░░░░░░░░░░░]   12.0 GB
+Pictures/     [██░░░░░░░░░░░░░░░░░░░░░░]    6.5 GB
 ```
 
 ## Requisitos
@@ -176,8 +176,8 @@ Lo puedes abrir para ver qué borraste:
 |---|---|
 | `disco -i [RUTA]` | Navegador interactivo para explorar `RUTA` y mandar cosas a la Papelera (por defecto, la carpeta actual). |
 | `disco` | Espacio de cada disco conectado: usado, libre, disponible (solo macOS) y total. |
-| `disco -c [RUTA]` | Las carpetas más pesadas dentro de `RUTA` (por defecto, la carpeta actual). |
-| `disco -c RUTA -n 5` | Igual, pero solo las 5 más pesadas (por defecto, 15). |
+| `disco -c [RUTA]` | Lo más pesado (carpetas y archivos) dentro de `RUTA` (por defecto, la carpeta actual). |
+| `disco -c RUTA -n 5` | Igual, pero solo las 5 cosas más pesadas (por defecto, 15). |
 | `disco --json` | La salida en JSON, para usarla en scripts (funciona con `disco` y `disco -c`). |
 | `disco -s` | Cuánto has liberado con `disco` hoy y desde que lo instalaste (cuenta lo que mandas a la Papelera con `d`). |
 | `disco -w 50` | Cambia el ancho de las barras (por defecto, 30). |
