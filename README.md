@@ -10,35 +10,13 @@ pesado de un lugar, carpetas y archivos (`disco -c`).
 
 La forma principal de usarlo:
 
-```
-$ disco -i ~/Proyecto
-disco — ~/Proyecto                                150.0 GB libres · 172.5 GB disponibles (70.0 % usado)
-───────────────────────────────────────────────────────────────────────────────────────────────────
-     9.0 MB [████████████████████]  64.7%  Videos/
->    3.0 MB [███████░░░░░░░░░░░░░]  21.6%  Fotos/
-     1.2 MB [███░░░░░░░░░░░░░░░░░]   8.6%  Proyectos/
-   503.8 KB [█░░░░░░░░░░░░░░░░░░░]   3.6%  Descargas/
-   200.7 KB [░░░░░░░░░░░░░░░░░░░░]   1.4%  notas.txt
-
-───────────────────────────────────────────────────────────────────────────────────────────────────
-(↑↓) mover  (→/Enter) entrar  (←) subir  (d) a la Papelera  (o) ver en Finder  (r) reescanear  (q) salir
-```
+![disco -i: navegador interactivo](res/disco1.png)
 
 Además:
 
-```
-$ disco
-Macintosh HD  [█████████████████████░░░░░░░░░]  70.0%   350.0 GB usados · 150.0 GB libres · 172.5 GB disponibles · 500.0 GB total
-```
+![disco: espacio de cada disco](res/disco2.png)
 
-```
-$ disco -c ~ -n 5
-Library/      [████████████████████████]   80.0 GB
-Downloads/    [████████████░░░░░░░░░░░░]   40.0 GB
-Movies/       [████████░░░░░░░░░░░░░░░░]   25.0 GB
-Documents/    [████░░░░░░░░░░░░░░░░░░░░]   12.0 GB
-Pictures/     [██░░░░░░░░░░░░░░░░░░░░░░]    6.5 GB
-```
+![disco -c: lo más pesado de una carpeta](res/disco3.png)
 
 ## Requisitos
 

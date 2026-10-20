@@ -3,7 +3,7 @@
 pesadas, y un navegador interactivo para limpiar el disco. Corre en macOS, Linux y
 Windows."""
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 import argparse
 import json
@@ -15,6 +15,7 @@ import shutil
 import subprocess
 import sys
 import time
+import unicodedata
 import urllib.parse
 
 VERDE, AMARILLO, ROJO, GRIS, NEGRITA, RESET = (
@@ -179,6 +180,59 @@ def legible(n):
         n /= 1000
 
 
+def ancho_letra(c):
+    """Columnas que ocupa un carácter en la terminal: los acentos combinantes y los de
+    ancho cero no ocupan, los emojis y el chino/japonés ocupan dos."""
+    if unicodedata.combining(c) or unicodedata.category(c) in ("Mn", "Me", "Cf"):
+        return 0
+    return 2 if unicodedata.east_asian_width(c) in ("W", "F") else 1
+
+
+def ancho_visible(texto):
+    return sum(ancho_letra(c) for c in texto)
+
+
+def rellenar(texto, ancho):
+    """Como ljust, pero contando columnas en pantalla y no caracteres."""
+    return texto + " " * max(ancho - ancho_visible(texto), 0)
+
+
+def recortar(texto, maximo):
+    """Si no cabe en `maximo` columnas, lo corta por en medio con '…' para que se vean
+    el principio y el final (la extensión, o la '/' de las carpetas)."""
+    texto = unicodedata.normalize("NFC", texto)  # macOS da 'ñ' como 'n' + tilde
+    if ancho_visible(texto) <= maximo:
+        return texto
+    # Letras completas: cada una con sus acentos combinantes, para no separarlos.
+    letras = []
+    for c in texto:
+        if letras and ancho_letra(c) == 0:
+            letras[-1] += c
+        else:
+            letras.append(c)
+    cabe = max(maximo - 1, 0)
+    inicio, fin = [], []
+    ancho_inicio = ancho_fin = 0
+    i, j = 0, len(letras) - 1
+    # Se toma una letra de cada lado, alternando, hasta llenar lo que cabe.
+    while i <= j:
+        if ancho_inicio <= ancho_fin:
+            a = ancho_visible(letras[i])
+            if ancho_inicio + ancho_fin + a > cabe:
+                break
+            inicio.append(letras[i])
+            ancho_inicio += a
+            i += 1
+        else:
+            a = ancho_visible(letras[j])
+            if ancho_inicio + ancho_fin + a > cabe:
+                break
+            fin.insert(0, letras[j])
+            ancho_fin += a
+            j -= 1
+    return "".join(inicio) + "…" + "".join(fin)
+
+
 def barra(pct, ancho, color):
     llenos = round(pct / 100 * ancho)
     if not color:
@@ -304,15 +358,21 @@ def mostrar_carpetas(ruta, top, ancho, color, como_json):
         print(f"No se pudo leer nada en {ruta}")
         return
     mayor = datos[0]["bytes"] or 1
-    nombres = [os.path.basename(c["ruta"].rstrip(os.sep)) + ("/" if c["carpeta"] else "")
-               for c in datos]
-    ancho_nombre = max(len(n) for n in nombres)
+    # Lo que queda de la línea tras el nombre: 2 espacios, [barra], espacio y 9 del tamaño.
+    columnas = shutil.get_terminal_size().columns
+    maximo = max(min(40, columnas - ancho - 15), 10)
+    nombres = [
+        recortar(os.path.basename(c["ruta"].rstrip(os.sep)) + ("/" if c["carpeta"] else ""),
+                 maximo)
+        for c in datos
+    ]
+    ancho_nombre = max(ancho_visible(n) for n in nombres)
     for nombre, c in zip(nombres, datos):
         pct = c["bytes"] / mayor * 100
         if color:
-            nombre_txt = f"{NEGRITA}{nombre.ljust(ancho_nombre)}{RESET}"
+            nombre_txt = f"{NEGRITA}{rellenar(nombre, ancho_nombre)}{RESET}"
         else:
-            nombre_txt = nombre.ljust(ancho_nombre)
+            nombre_txt = rellenar(nombre, ancho_nombre)
         print(f"{nombre_txt}  {barra(pct, ancho, color)} {legible(c['bytes']):>9}")
 
 
@@ -1027,9 +1087,10 @@ def main():
         print(json.dumps(datos, indent=2, ensure_ascii=False))
         return
 
-    ancho_nombre = max((len(d["nombre"]) for d in datos), default=0)
-    for d in datos:
-        nombre = d["nombre"].ljust(ancho_nombre)
+    nombres = [unicodedata.normalize("NFC", d["nombre"]) for d in datos]
+    ancho_nombre = max((ancho_visible(n) for n in nombres), default=0)
+    for nombre, d in zip(nombres, datos):
+        nombre = rellenar(nombre, ancho_nombre)
         if color:
             nombre = f"{NEGRITA}{nombre}{RESET}"
         print(
