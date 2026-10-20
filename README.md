@@ -8,13 +8,15 @@ entras, ves qué se está comiendo el espacio y lo mandas a la Papelera sin sali
 terminal. También puedes ver rápido el espacio libre de tus discos (`disco`) o lo más
 pesado de un lugar, carpetas y archivos (`disco -c`).
 
-La forma principal de usarlo:
+La forma principal de usarlo, corriendo `disco -i`, aqui navegas con las teclas indicadas en la imagen:
 
 ![disco -i: navegador interactivo](res/disco1.png)
 
-Además:
+Además puedes correr directo `disco` para obtener el uso de todos los discos del SO:
 
 ![disco: espacio de cada disco](res/disco2.png)
+
+No olvidar `disco -c` o `disco -c -n 5` para obtener las carpetas/archivos mas pesados del directorio
 
 ![disco -c: lo más pesado de una carpeta](res/disco3.png)
 
